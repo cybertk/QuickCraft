@@ -80,6 +80,8 @@ function Schematic:Craft(numCasts)
 		C_TradeSkillUI.CraftEnchant(self.spell, numCasts, reagents, location, self.concentration ~= nil)
 	elseif self.salvage and location then
 		C_TradeSkillUI.CraftSalvage(self.spell, numCasts, location)
+	else
+		C_TradeSkillUI.CraftRecipe(self.spell, numCasts, reagents, nil, nil, self.concentration ~= nil)
 	end
 end
 

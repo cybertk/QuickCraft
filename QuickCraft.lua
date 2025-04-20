@@ -43,6 +43,10 @@ function QuickCraft:Init()
 	hooksecurefunc(C_TradeSkillUI, "CraftSalvage", function(recipeSpellID, numCasts, itemTarget, craftingReagents, applyConcentration)
 		QuickCraft:SaveSchematic(recipeSpellID, craftingReagents, nil, itemTarget, applyConcentration)
 	end)
+
+	hooksecurefunc(C_TradeSkillUI, "CraftRecipe", function(recipeSpellID, numCasts, craftingReagents, recipeLevel, orderID, applyConcentration)
+		QuickCraft:SaveSchematic(recipeSpellID, craftingReagents, nil, nil, applyConcentration)
+	end)
 end
 
 function QuickCraft:CreateOverlayButton(button, skillLine)
