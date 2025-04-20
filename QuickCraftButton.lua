@@ -149,7 +149,7 @@ end
 function QuickCraftButtonMixin:UpdateTooltip(tooltip)
 	if IsAltKeyDown() then
 		self:AddCraftDetailsToTooltip(tooltip)
-	else
+	elseif not IsModifierKeyDown() then
 		self:AddInstructionsToTooltip(tooltip)
 	end
 end
