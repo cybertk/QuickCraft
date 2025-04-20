@@ -17,7 +17,7 @@
 ## Category-zhCN: 专业
 ## Category-zhTW: 專業技能
 ## X-Website: https://github.com/cybertk/QuickCraft
-## X-Curse-Project-ID: x
+## X-Curse-Project-ID: 1247614
 ## X-Wago-ID: x
 ## X-WoWI-ID: x
 
