@@ -135,6 +135,14 @@ function QuickCraft:GetLastSchematic(skillLine, isSalvage)
 	return self:GetSchematic(lastCraft[skillLine].recipe)
 end
 
+function QuickCraft:Craft(recipeID)
+	local schematic = self:GetSchematic(recipeID)
+
+	if schematic then
+		schematic:Craft()
+	end
+end
+
 function QuickCraft:ExecuteChatCommands(command)
 	if command == "debug" then
 		-- Toggle Debug Mode
@@ -144,7 +152,19 @@ function QuickCraft:ExecuteChatCommands(command)
 		return
 	end
 
-	print("Usage: |n/qc debug - Turn on/off debugging mode")
+	local action, recipe
+	command:gsub("(%a+)%s*(%d*)", function(a, b)
+		action, recipe = a, b
+	end)
+
+	if action == "craft" then
+		QuickCraft:Craft(tonumber(recipe))
+		return
+	end
+
+	print("Usage:")
+	print("  /qc debug - Turn on/off debugging mode")
+	print("  /qc craft <recipeID> - Craft the recipe with last-used reagents")
 end
 
 if _G["QuickCraft"] == nil then
