@@ -130,7 +130,7 @@ function QuickCraftButtonMixin:AddCraftDetailsToTooltip(tooltip)
 			self:AddReagentLineToToolTip(tooltip, indent, slot.reagents[1].itemID, slot.quantityRequired)
 		elseif slot.dataSlotType == Enum.TradeskillSlotDataType.ModifiedReagent then
 			for _, reagent in ipairs(self.lastCraft.reagents) do
-				if reagent.i == slot.slotIndex then
+				if reagent.i == slot.dataSlotIndex then
 					self:AddReagentLineToToolTip(tooltip, indent, reagent.item, reagent.v)
 				end
 			end
