@@ -5,7 +5,7 @@ local Util = ns.Util
 local QuickCraftButtonMixin = {}
 
 function QuickCraftButtonMixin:OnLoad()
-	local button = self:GetParent()
+	local button = self.actionButton
 
 	Util:Debug("QuickCraftButtonMixin.OnLoad", button:GetName())
 

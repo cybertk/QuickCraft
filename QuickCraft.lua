@@ -28,7 +28,7 @@ function QuickCraft:Init()
 			return
 		end
 
-		local button = tooltip:GetOwner().QuickCraftOverlay
+		local button = self.buttons[tooltip:GetOwner()]
 		if button == nil then
 			return
 		end
@@ -50,22 +50,22 @@ function QuickCraft:Init()
 end
 
 function QuickCraft:CreateOverlayButton(button, skillLine)
-	if button.QuickCraftOverlay then
+	if self.buttons[button] then
 		Util:Debug("Error: Button has been initialized", button:GetName())
 		return
 	end
 
-	local overlay = CreateFrame("Button", nil, button, "UIPanelButtonTemplate")
+	local overlay = CreateFrame("Button", "QuickCraft" .. button:GetName(), UIParent, "UIPanelButtonTemplate")
 
 	overlay.skillLine = skillLine
 	overlay.lastCraft = self:GetLastSchematic(skillLine, false)
 	overlay.lastSalvage = self:GetLastSchematic(skillLine, true)
+	overlay.actionButton = button
 	Mixin(overlay, ns.QuickCraftButtonMixin)
 
 	overlay:OnLoad()
 
-	button.QuickCraftOverlay = overlay
-	table.insert(self.buttons, overlay)
+	self.buttons[button] = overlay
 end
 
 function QuickCraft:SaveSchematic(recipeSpellID, craftingReagents, enchantItem, salvageItem, applyConcentration)
