@@ -1,10 +1,11 @@
 ## Interface: 120000
-## Title: QuickCraft
-## Notes: Crafting Automation
 ## Version: @project-version@
-## IconTexture: Interface\AddOns\QuickCraft\Icon.blp
-## SavedVariables: QuickCraftDB
-## SavedVariablesPerCharacter: QuickCraftPerCharacterDB
+
+## Title: QuickCraft
+
+## Notes: Crafting Automation
+## Author: cybertk
+
 ## Category-enUS: Professions
 ## Category-deDE: Berufe
 ## Category-esES: Profesiones
@@ -16,11 +17,17 @@
 ## Category-ruRU: Профессии
 ## Category-zhCN: 专业
 ## Category-zhTW: 專業技能
+
+## SavedVariables: QuickCraftDB
+## SavedVariablesPerCharacter: QuickCraftPerCharacterDB
+## IconTexture: Interface\AddOns\QuickCraft\Icon.blp
+
+## X-Flavor: retail
+## X-Expansion: MN
 ## X-Website: https://github.com/cybertk/QuickCraft
 ## X-Curse-Project-ID: 1247614
-## X-Wago-ID: x
-## X-WoWI-ID: x
-
+## X-Wago-ID:
+## X-WoWI-ID: 27036
 
 Util.lua
 
