@@ -80,7 +80,7 @@ function QuickCraft:SaveSchematic(recipeSpellID, craftingReagents, enchantItem, 
 		return
 	end
 
-	Util:Debug("Saving schematic:", recipeSchematic.recipeID)
+	Util:Debug("Saving schematic:", recipeSchematic.recipeID, #craftingReagents)
 	local schematic = Schematic:Create(recipeSpellID, craftingReagents, enchantItem, salvageItem, applyConcentration)
 
 	self.db.char.schematics[schematic.recipe] = schematic
@@ -112,7 +112,7 @@ function QuickCraft:RestoreSchematic()
 		return
 	end
 
-	Schematic.Allocate(schematic)
+	schematic:Allocate()
 end
 
 function QuickCraft:GetSchematic(recipeID)

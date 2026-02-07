@@ -15,12 +15,11 @@ end
 
 function Schematic:Create(recipeSpellID, craftingReagents, enchantItem, salvageItem, applyConcentration)
 	local recipeSchematic = C_TradeSkillUI.GetRecipeSchematic(recipeSpellID, false)
-
 	local o = {}
 
 	o.reagents = {}
 	for _, reagent in ipairs(craftingReagents or {}) do
-		table.insert(o.reagents, { i = reagent.dataSlotIndex, item = reagent.itemID, v = reagent.quantity })
+		table.insert(o.reagents, { i = reagent.dataSlotIndex, item = reagent.reagent.itemID, v = reagent.quantity })
 	end
 
 	if enchantItem then
@@ -34,6 +33,8 @@ function Schematic:Create(recipeSpellID, craftingReagents, enchantItem, salvageI
 	if applyConcentration then
 		local ops = C_TradeSkillUI.GetCraftingOperationInfo(recipeSchematic.recipeID, craftingReagents, nil, true)
 		o.concentration = ops.concentrationCost
+
+		Util:Debug("Saved Concentration", o.concentration)
 	end
 
 	o.recipe = recipeSchematic.recipeID
@@ -94,23 +95,8 @@ function Schematic:Allocate()
 		return
 	end
 
-	transaction:SetApplyConcentration(self.concentration ~= nil)
-
-	local target = self.salvage or self.enchant
-	if target then
-		local item = Item:CreateFromItemGUID(target)
-		if not item:HasItemLocation() then
-		end
-	end
-
 	if self.salvage then
-		local item
-
-		if type(self.salvage == "string") then
-			item = Item:CreateFromItemGUID(self.salvage)
-		else
-			local items = C_TradeSkillUI.GetCraftingTargetItems({ self.salvage })
-		end
+		local item = Item:CreateFromItemGUID(self.salvage)
 
 		Util:Debug("Allocating salvage:", self.salvage, item:GetItemLink())
 		if item:GetItemID() then
@@ -129,43 +115,45 @@ function Schematic:Allocate()
 		end
 	end
 
-	local indexToReagentSlot = {}
-	local reagentSlotToFinishingSlot = {}
-	local finishingSlot = 0
-	for slot, slotSchematic in ipairs(transaction:GetRecipeSchematic().reagentSlotSchematics) do
-		if slotSchematic.dataSlotType == Enum.TradeskillSlotDataType.ModifiedReagent then
-			indexToReagentSlot[slotSchematic.dataSlotIndex] = slot
-			transaction:ClearAllocations(slot)
-		end
+	self:AllocateReagents(schematicForm)
 
-		if slotSchematic.reagentType == Enum.CraftingReagentType.Finishing then
-			finishingSlot = finishingSlot + 1
-			reagentSlotToFinishingSlot[slot] = finishingSlot
+	transaction:SetApplyConcentration(self.concentration ~= nil)
+	transaction:SetManuallyAllocated(true)
+
+	allocated = transaction
+end
+
+function Schematic:AllocateReagents(schematicForm)
+	local transaction = schematicForm:GetTransaction()
+
+	local slots = {}
+	for _, reagentSlots in pairs(schematicForm.reagentSlots) do
+		for _, slot in ipairs(reagentSlots) do
+			local schematic = slot:GetReagentSlotSchematic()
+
+			if schematic.dataSlotType == Enum.TradeskillSlotDataType.ModifiedReagent then
+				transaction:ClearAllocations(schematic.slotIndex)
+			end
+
+			slots[schematic.dataSlotIndex] = slot
 		end
 	end
 
-	for _, reagent in ipairs(self.reagents) do
-		local count = C_Item.GetItemCount(reagent.item, true, true, true, true)
-		local slot = indexToReagentSlot[reagent.i]
-		local finishingSlot = reagentSlotToFinishingSlot[slot]
+	for _, reagent in ipairs(self.reagents or {}) do
+		local slot = slots[reagent.i]
+		local count = 0
 
-		Util:Debug("Allocating", slot, reagent.i, reagent.item, reagent.v, count, finishingSlot)
+		if reagent.item then
+			count = C_Item.GetItemCount(reagent.item, true, true, true, true)
+		end
+
+		Util:Debug("Allocating", slot:GetSlotIndex(), reagent.i, reagent.item, reagent.v, count)
 
 		if count >= reagent.v then
-			transaction:GetAllocations(slot):Allocate({ itemID = reagent.item }, reagent.v)
-
-			if finishingSlot then
-				local item = Item:CreateFromItemID(reagent.item)
-
-				schematicForm.reagentSlots[Enum.CraftingReagentType.Finishing][finishingSlot]:SetItem(item)
-			end
+			transaction:GetAllocations(slot:GetSlotIndex()):Allocate({ itemID = reagent.item }, reagent.v)
+			slot:SetReagent({ itemID = reagent.item })
 		end
 	end
-
-	schematicForm:UpdateAllSlots()
-
-	transaction:SetManuallyAllocated(true)
-	allocated = transaction
 end
 
 ns.Schematic = Schematic
