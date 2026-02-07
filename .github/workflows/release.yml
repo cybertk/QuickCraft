@@ -17,11 +17,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
-
-      - name: Enable automatic changelog
-        run: rm CHANGELOG.md
-        if: github.ref_type != 'tag'
+          fetch-depth: 0
 
       - name: Release
         uses: BigWigsMods/packager@v2
