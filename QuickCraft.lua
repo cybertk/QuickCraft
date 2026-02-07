@@ -49,6 +49,22 @@ function QuickCraft:Init()
 	end)
 end
 
+function QuickCraft:CreateCheckbox()
+	Util:Debug("Adding Checkbox")
+
+	local anchor = ProfessionsFrame.CraftingPage.SchematicForm.AllocateBestQualityCheckbox
+	local checkbox = CreateFrame("CheckButton", nil, anchor:GetParent(), "UICheckButtonTemplate")
+
+	Mixin(checkbox, ns.QuickCraftCheckboxMixin)
+
+	checkbox:OnLoad()
+	checkbox:SetSize(anchor:GetSize())
+	checkbox:SetAllPoints(anchor)
+	checkbox:Show()
+
+	anchor:HookScript("OnShow", GenerateClosure(anchor.Hide, anchor))
+end
+
 function QuickCraft:CreateOverlayButton(button, skillLine)
 	if self.buttons[button] then
 		Util:Debug("Error: Button has been initialized", button:GetName())
@@ -69,8 +85,8 @@ function QuickCraft:CreateOverlayButton(button, skillLine)
 end
 
 function QuickCraft:SaveSchematic(recipeSpellID, craftingReagents, enchantItem, salvageItem, applyConcentration)
-	if ProfessionsFrame == nil or not ProfessionsFrame:IsVisible() then
-		Util:Debug("Skip saving schematic: QuickCraft")
+	if not self.db.char.enabled or ProfessionsFrame == nil or not ProfessionsFrame:IsVisible() then
+		Util:Debug("Skip saving schematic: ", self.db.char.enabled, ProfessionsFrame)
 		return
 	end
 
@@ -206,9 +222,7 @@ if _G["QuickCraft"] == nil then
 	end)
 
 	QuickCraft:RegisterEvent("TRADE_SKILL_SHOW", function()
-		hooksecurefunc(ProfessionsFrame.CraftingPage.SchematicForm, "Init", function()
-			QuickCraft:RestoreSchematic()
-		end)
+		QuickCraft:CreateCheckbox(ProfessionsFrame.CraftingPage.SchematicForm.AllocateBestQualityCheckbox)
 		QuickCraft:UnregisterEvent("TRADE_SKILL_SHOW")
 	end)
 

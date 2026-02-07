@@ -86,14 +86,9 @@ function Schematic:Craft(numCasts)
 	end
 end
 
-local allocated = nil
 function Schematic:Allocate()
 	local schematicForm = ProfessionsFrame.CraftingPage.SchematicForm
 	local transaction = schematicForm:GetTransaction()
-
-	if allocated == transaction then
-		return
-	end
 
 	if self.salvage then
 		local item = Item:CreateFromItemGUID(self.salvage)
@@ -120,7 +115,7 @@ function Schematic:Allocate()
 	transaction:SetApplyConcentration(self.concentration ~= nil)
 	transaction:SetManuallyAllocated(true)
 
-	allocated = transaction
+	return true
 end
 
 function Schematic:AllocateReagents(schematicForm)

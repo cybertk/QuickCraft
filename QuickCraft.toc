@@ -26,4 +26,5 @@ Util.lua
 
 Schematic.lua
 QuickCraftButton.lua
+QuickCraftCheckbox.lua
 QuickCraft.lua
