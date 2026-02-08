@@ -11,23 +11,46 @@ function QuickCraftButtonMixin:OnLoad()
 
 	self:SetAllPoints(button)
 	self:SetAlpha(0)
-	self:SetScript("OnMouseDown", function(f, key)
-		if key == "LeftButton" and not IsAltKeyDown() then
-			button:Click()
-			return
-		end
+	self:SetFrameStrata("LOW")
+	self:SetScript("OnEvent", self.OnEvent)
+	self:SetScript("OnEnter", self.OnEnter)
+	self:SetScript("OnLeave", self.OnLeave)
+	self:SetScript("OnClick", self.OnClick)
 
-		if IsAltKeyDown() then
-			self:Craft(key == "RightButton")
-		end
+	button:HookScript("OnEnter", function()
+		self:RegisterEvent("MODIFIER_STATE_CHANGED")
+		self:SetFrameStrata(IsAltKeyDown() and "HIGH" or "LOW")
 	end)
-	self:SetScript("OnEnter", function(f)
-		button:OnEnter()
+	button:HookScript("OnLeave", function()
+		self:UnregisterEvent("MODIFIER_STATE_CHANGED")
 	end)
-	self:SetScript("OnLeave", function(f)
-		button:OnLeave()
-	end)
+
 	self:Show()
+end
+
+function QuickCraftButtonMixin:OnEvent(event, ...)
+	if event == "MODIFIER_STATE_CHANGED" then
+		self:SetFrameStrata(IsAltKeyDown() and "HIGH" or "LOW")
+	end
+end
+
+function QuickCraftButtonMixin:OnEnter()
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+	GameTooltip:SetText("QuickCraft")
+
+	self:AddCraftDetailsToTooltip(GameTooltip)
+	GameTooltip:Show()
+	self:RegisterEvent("MODIFIER_STATE_CHANGED")
+end
+
+function QuickCraftButtonMixin:OnLeave()
+	self:UnregisterEvent("MODIFIER_STATE_CHANGED")
+	GameTooltip:Hide()
+	self:SetFrameStrata("LOW")
+end
+
+function QuickCraftButtonMixin:OnClick(button)
+	self:Craft(button == "RightButton")
 end
 
 function QuickCraftButtonMixin:Craft(isSalvage)
@@ -97,7 +120,7 @@ function QuickCraftButtonMixin:AddConcentrationLineToToolTip(tooltip, indent)
 		return
 	end
 
-	local fulfilled = currency.quantity >= self.lastCraft.concentration
+	local fulfilled = currency.quantity >= (self.lastCraft.concentration or 0)
 
 	tooltip:AddDoubleLine(
 		format("%s|T%d:15|t %s", indent, currency.iconFileID, currency.name),
@@ -109,6 +132,7 @@ function QuickCraftButtonMixin:AddConcentrationLineToToolTip(tooltip, indent)
 end
 
 function QuickCraftButtonMixin:AddCraftDetailsToTooltip(tooltip)
+	self.lastCraft = QuickCraft:GetLastSchematic(self.skillLine, false)
 	if self.lastCraft == nil then
 		tooltip:AddLine("|cnRED_FONT_COLOR:No recipe to QuickCraft|r")
 		return
@@ -143,14 +167,6 @@ function QuickCraftButtonMixin:AddCraftDetailsToTooltip(tooltip)
 		GameTooltip_AddInstructionLine(tooltip, "Press |A:NPE_LeftClick:16:16|a to craft last recipe " .. recipeName)
 	else
 		tooltip:AddLine(format("|cnRED_FONT_COLOR:%s|r", PROFESSIONS_INSUFFICIENT_REAGENTS))
-	end
-end
-
-function QuickCraftButtonMixin:UpdateTooltip(tooltip)
-	if IsAltKeyDown() then
-		self:AddCraftDetailsToTooltip(tooltip)
-	elseif not IsModifierKeyDown() then
-		self:AddInstructionsToTooltip(tooltip)
 	end
 end
 

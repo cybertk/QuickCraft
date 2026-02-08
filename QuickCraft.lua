@@ -20,11 +20,7 @@ function QuickCraft:Init()
 	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Spell, function(tooltip, data)
 		local spellID = tooltip:GetPrimaryTooltipData().id
 
-		if not professionSpells[spellID] then
-			return
-		end
-
-		if tooltip:GetOwner() == nil then
+		if not professionSpells[spellID] or tooltip:GetOwner() == nil then
 			return
 		end
 
@@ -33,7 +29,7 @@ function QuickCraft:Init()
 			return
 		end
 
-		button:UpdateTooltip(tooltip)
+		button:AddInstructionsToTooltip(tooltip)
 	end)
 
 	hooksecurefunc(C_TradeSkillUI, "CraftEnchant", function(recipeSpellID, numCasts, craftingReagents, itemTarget, applyConcentration)
@@ -74,8 +70,6 @@ function QuickCraft:CreateOverlayButton(button, skillLine)
 	local overlay = CreateFrame("Button", "QuickCraft" .. button:GetName(), UIParent, "UIPanelButtonTemplate")
 
 	overlay.skillLine = skillLine
-	overlay.lastCraft = self:GetLastSchematic(skillLine, false)
-	overlay.lastSalvage = self:GetLastSchematic(skillLine, true)
 	overlay.actionButton = button
 	Mixin(overlay, ns.QuickCraftButtonMixin)
 

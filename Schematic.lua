@@ -73,7 +73,7 @@ function Schematic:Craft(numCasts)
 
 	local reagents = {}
 	for _, reagent in ipairs(self.reagents) do
-		table.insert(reagents, { itemID = reagent.item, dataSlotIndex = reagent.i, quantity = reagent.v })
+		table.insert(reagents, { reagent = { itemID = reagent.item }, dataSlotIndex = reagent.i, quantity = reagent.v })
 	end
 
 	local location = self:GetTargetItemLocation()
