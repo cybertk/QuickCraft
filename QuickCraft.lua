@@ -20,6 +20,10 @@ function QuickCraft:Init()
 	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Spell, function(tooltip, data)
 		local spellID = tooltip:GetPrimaryTooltipData().id
 
+		if issecretvalue(spellID) then
+			return
+		end
+
 		if not professionSpells[spellID] or tooltip:GetOwner() == nil then
 			return
 		end
